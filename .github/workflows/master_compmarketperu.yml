@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy JAR app to Azure Web App - CompMarketPeru
 
 on:
@@ -12,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read #This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
@@ -25,23 +20,20 @@ jobs:
           distribution: "microsoft"
 
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn clean install -DskipTests
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: "${{ github.workspace }}/target/*.jar"
+          path: target/*.jar
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
 
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: java-app
@@ -53,12 +45,21 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D3B14F5C8110448295ED61E2EFFDD860 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C35170C62DE24A56B081AD4CE10DC7AC }}
 
+      - name: Set App Settings (ENV vars)
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az webapp config appsettings set \
+              --name CompMarketPeru \
+              --resource-group CompMarketPerú \
+              --settings \
+                DB_URL='${{ secrets.DB_URL }}' \
+                DB_USERNAME='${{ secrets.DB_USERNAME }}' \
+                DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
+
       - name: Deploy to Azure Web App
-        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: "CompMarketPeru"
           slot-name: "Production"
           package: "*.jar"
-          app-settings: |
-            DB_URL=${{ secrets.DB_URL }}
