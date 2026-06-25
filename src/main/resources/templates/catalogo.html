@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catálogo - CompMarketPerú</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link th:href="@{/css/autodoc.css}" rel="stylesheet">
+</head>
+<body>
+
+<nav class	="catalog-nav">
+  <div class="container d-flex align-items-center justify-content-between">
+    <span class="catalog-brand">
+      <span class="catalog-dot"></span>
+      CompMarketPerú &middot; Catálogo
+    </span>
+    <a th:href="@{/app/dashboard}" class="btn btn-outline-light btn-sm">Ingresar al sistema</a>
+  </div>
+</nav>
+
+<header class="catalog-hero">
+  <div class="container">
+    <div class="catalog-eyebrow">Vitrina digital</div>
+    <h1>Equipo y componentes, listos para tu negocio</h1>
+    <p class="catalog-hero-sub">Consulta precios y disponibilidad en tiempo real. Para comprar o reservar, contáctanos o ingresa al sistema si eres parte del equipo de ventas.</p>
+
+    <div class="catalog-search-row">
+      <input type="text" id="buscador" class="form-control catalog-search" placeholder="Buscar por nombre o marca…">
+    </div>
+
+    <div class="catalog-filters" id="filtros">
+      <button type="button" class="filtro-chip activo" data-cat="todos">Todos</button>
+    </div>
+  </div>
+</header>
+
+<main class="container catalog-grid-wrap">
+
+  <p id="sinResultados" class="text-center text-muted py-5" style="display:none;">
+    No encontramos productos que coincidan con tu búsqueda.
+  </p>
+
+  <div class="row g-4" id="grid">
+    <div class="col-6 col-md-4 col-lg-3 producto-col"
+         th:each="p : ${productos}"
+         th:attr="data-cat=${p.categoria != null ? p.categoria.nombre : 'Otros'},
+                   data-nombre=${#strings.toLowerCase(p.nombre + ' ' + p.marca)}">
+      <div class="card producto-card h-100">
+        <div class="producto-img">
+          <img th:if="${p.imagen_url}" th:src="${p.imagen_url}" alt="producto">
+          <span th:unless="${p.imagen_url}" class="producto-img-fallback" th:text="${#strings.substring(p.nombre,0,1)}">P</span>
+        </div>
+        <div class="card-body d-flex flex-column">
+          <div class="producto-marca" th:text="${p.marca}"></div>
+          <h6 class="producto-nombre" th:text="${p.nombre}"></h6>
+          <p class="producto-modelo text-muted" th:if="${p.modelo}" th:text="${p.modelo}"></p>
+          <div class="mt-auto pt-2 d-flex align-items-center justify-content-between">
+            <span class="producto-precio" th:text="${'S/ ' + #numbers.formatDecimal(p.precio_venta, 1, 2)}"></span>
+            <span class="badge-stock disponible" th:if="${p.stock != null and p.stock > 0}">Disponible</span>
+            <span class="badge-stock agotado" th:if="${p.stock == null or p.stock == 0}">Agotado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="catalog-footer">
+  <div class="container">CompMarketPerú &middot; AUTODOC</div>
+</footer>
+
+<script th:inline="javascript">
+  const cards = Array.from(document.querySelectorAll('.producto-col'));
+  const buscador = document.getElementById('buscador');
+  const filtrosCont = document.getElementById('filtros');
+  const sinResultados = document.getElementById('sinResultados');
+
+  // Construye los filtros de categoría a partir de los productos renderizados
+  const categorias = Array.from(new Set(cards.map(c => c.dataset.cat))).sort();
+  categorias.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'filtro-chip';
+    btn.dataset.cat = cat;
+    btn.textContent = cat;
+    filtrosCont.appendChild(btn);
+  });
+
+  let categoriaActiva = 'todos';
+
+  function aplicarFiltro() {
+    const texto = buscador.value.trim().toLowerCase();
+    let visibles = 0;
+    cards.forEach(c => {
+      const coincideTexto = c.dataset.nombre.includes(texto);
+      const coincideCat = categoriaActiva === 'todos' || c.dataset.cat === categoriaActiva;
+      const mostrar = coincideTexto && coincideCat;
+      c.style.display = mostrar ? '' : 'none';
+      if (mostrar) visibles++;
+    });
+    sinResultados.style.display = visibles === 0 ? '' : 'none';
+  }
+
+  buscador.addEventListener('input', aplicarFiltro);
+  filtrosCont.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filtro-chip');
+    if (!btn) return;
+    filtrosCont.querySelectorAll('.filtro-chip').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo');
+    categoriaActiva = btn.dataset.cat;
+    aplicarFiltro();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Usuarios - AUTODOC</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link th:href="@{/css/autodoc.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div class="container">
+
+  <h2 class="page-title mb-4">Usuarios del Sistema</h2>
+  <a th:href="@{/usuarios/nuevo}" class="btn btn-success mb-3">Nuevo Usuario</a>
+
+  <table class="table table-bordered table-striped">
+    <thead><tr><th>ID</th><th>Usuario</th><th>Persona</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+      <tr th:each="u : ${usuarios}">
+        <td th:text="${u.id_user}"></td>
+        <td th:text="${u.username}"></td>
+        <td th:text="${u.persona != null ? (u.persona.nombres + ' ' + u.persona.apellidos) : ''}"></td>
+        <td th:text="${u.rol != null ? u.rol.nombre_rol : ''}"></td>
+        <td th:text="${u.estado == 1 ? 'Activo' : 'Inactivo'}"></td>
+        <td>
+          <a class="btn btn-warning btn-sm" th:href="@{/usuarios/editar/{id}(id=${u.id_user})}">Editar</a>
+          <a class="btn btn-danger btn-sm" th:href="@{/usuarios/eliminar/{id}(id=${u.id_user})}"
+             onclick="return confirm('¿Eliminar este usuario?');">Eliminar</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+  <div th:insert="~{fragments/footer :: footer}"></div>
+</body>
+</html>
