@@ -51,7 +51,7 @@ jobs:
           inlineScript: |
             az webapp config appsettings set \
               --name CompMarketPeru \
-              --resource-group <TU_RESOURCE_GROUP> \
+              --resource-group CompMarketPerú  \
               --settings \
                 DB_URL='${{ secrets.DB_URL }}' \
                 DB_USERNAME='${{ secrets.DB_USERNAME }}' \
