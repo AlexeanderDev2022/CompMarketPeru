@@ -13,10 +13,9 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Java 21
+      - name: Set up Java version
         uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -25,7 +24,7 @@ jobs:
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      - name: Create stable JAR name
+      - name: Rename JAR
         run: cp target/*.jar target/app.jar
 
       - name: Upload artifact
@@ -50,9 +49,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.__clientidsecretname__ }}
-          tenant-id: ${{ secrets.__tenantidsecretname__ }}
-          subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_620E76F8C5C84A7EB487BFFABC50CE14 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A1D68E807C054241BDBEFD07582B6811 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_10F2EF3066C748C080AAE963E4731E71 }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
