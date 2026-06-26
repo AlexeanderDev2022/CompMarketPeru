@@ -21,17 +21,17 @@ jobs:
       - name: Set up Java version
         uses: actions/setup-java@v4
         with:
-          java-version: "21"
-          distribution: "microsoft"
+          java-version: '21'
+          distribution: 'microsoft'
 
       - name: Build with Maven
-        run: mvn clean install -DskipTests
+        run: mvn clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: "${{ github.workspace }}/target/*.jar"
+          path: '${{ github.workspace }}/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
@@ -39,24 +39,25 @@ jobs:
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
-
+  
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: java-app
-
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_3D9D320C66544BEA9A30C0B72013B983 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_CFA139E5D29C480991948EDF331CF3E2 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8D4F446D6DF4420F98FA27FDE7F74CE6 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F336DDB0604B4484B2CD28E7D583E165 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6C2EA108F18F45E1A861FBBFB8D4A018 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E4D14D57D9394000BFCFF451D1886507 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "CompMarketPeru"
-          slot-name: "Production"
-          package: "*.jar"
+          app-name: 'CompMarketPeru'
+          slot-name: 'Production'
+          package: '*.jar'
+          
