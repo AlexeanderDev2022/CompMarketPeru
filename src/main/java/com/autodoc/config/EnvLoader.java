@@ -15,7 +15,7 @@ public class EnvLoader {
                 .ignoreIfMissing()
                 .load();
 
-        String bd = dotenv.get("BD");
+        String bd = dotenv.get("BD_URL");
 
         if (bd != null && !bd.isBlank()) {
             System.setProperty("BD", bd);
